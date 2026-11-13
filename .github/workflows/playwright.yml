@@ -8,6 +8,11 @@ on:
     - cron: '0 3 * * *' # nightly run
   workflow_dispatch:
 
+# a new push to a PR cancels the outdated run; runs on main are never cancelled
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     name: ${{ matrix.project }}
@@ -27,9 +32,9 @@ jobs:
             browser: ''
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -45,15 +50,19 @@ jobs:
         run: npx playwright test --project=${{ matrix.project }}
         env:
           BLOB_REPORT_NAME: ${{ matrix.project }}
+          # nightly run: a test that only passes on retry fails the job
+          FAIL_ON_FLAKY: ${{ github.event_name == 'schedule' }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: report-${{ matrix.project }}
-          path: playwright-report/
+          path: |
+            playwright-report/
+            test-results/junit.xml
           retention-days: 14
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: blob-${{ matrix.project }}
@@ -78,16 +87,16 @@ jobs:
       cancel-in-progress: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
       - run: npm ci
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: blob-*
           path: all-blob-reports
@@ -96,9 +105,9 @@ jobs:
       - name: Merge reports into one HTML report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: playwright-report/
 
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

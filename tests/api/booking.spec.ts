@@ -1,11 +1,14 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 
 // Public practice API: https://restful-booker.herokuapp.com/apidoc/index.html
-// Default admin credentials are published in the API docs.
+// Default admin credentials are published in the API docs; override them via env vars.
+const API_USER = process.env.API_USER ?? 'admin';
+const API_PASSWORD = process.env.API_PASSWORD ?? 'password123';
 
+// The API is shared by everyone: a unique last name per run keeps our data apart.
 const newBooking = {
   firstname: 'Helena',
-  lastname: 'Tester',
+  lastname: `Tester-${Date.now()}`,
   totalprice: 180,
   depositpaid: true,
   bookingdates: { checkin: '2026-12-01', checkout: '2026-12-05' },
@@ -14,7 +17,7 @@ const newBooking = {
 
 async function getToken(request: APIRequestContext): Promise<string> {
   const res = await request.post('/auth', {
-    data: { username: 'admin', password: 'password123' },
+    data: { username: API_USER, password: API_PASSWORD },
   });
   expect(res.ok()).toBeTruthy();
   const { token } = await res.json();
@@ -70,7 +73,7 @@ test.describe('Booking API', () => {
 
   test('rejects invalid credentials', async ({ request }) => {
     const res = await request.post('/auth', {
-      data: { username: 'admin', password: 'wrong' },
+      data: { username: API_USER, password: 'wrong' },
     });
     expect(await res.json()).toEqual({ reason: 'Bad credentials' });
   });

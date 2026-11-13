@@ -7,6 +7,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
+  // set by the nightly CI run to surface flaky tests instead of hiding them behind retries
+  failOnFlakyTests: process.env.FAIL_ON_FLAKY === 'true',
   workers: isCI ? 2 : 3, // local cap for laptops; override with --workers=N
   reporter: isCI
     ? [
