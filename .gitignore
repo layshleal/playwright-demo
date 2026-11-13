@@ -7,3 +7,4 @@ playwright/.cache/
 
 # notas locais para o Claude Code (contém dados pessoais)
 CLAUDE.md
+all-blob-reports/

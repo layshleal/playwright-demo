@@ -43,6 +43,8 @@ jobs:
 
       - name: Run tests
         run: npx playwright test --project=${{ matrix.project }}
+        env:
+          BLOB_REPORT_NAME: ${{ matrix.project }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
@@ -50,3 +52,53 @@ jobs:
           name: report-${{ matrix.project }}
           path: playwright-report/
           retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: blob-${{ matrix.project }}
+          path: blob-report/
+          retention-days: 1
+
+  publish-report:
+    name: publish report
+    needs: test
+    # publish even when tests fail (a red report is still useful), but only from main
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: blob-*
+          path: all-blob-reports
+          merge-multiple: true
+
+      - name: Merge reports into one HTML report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: playwright-report/
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

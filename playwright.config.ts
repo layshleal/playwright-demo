@@ -9,7 +9,13 @@ export default defineConfig({
   retries: isCI ? 2 : 0,
   workers: isCI ? 2 : 3, // local cap for laptops; override with --workers=N
   reporter: isCI
-    ? [['github'], ['html', { open: 'never' }], ['junit', { outputFile: 'test-results/junit.xml' }]]
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['junit', { outputFile: 'test-results/junit.xml' }],
+        // one blob per CI job, merged into a single HTML report for GitHub Pages
+        ['blob', { fileName: `report-${process.env.BLOB_REPORT_NAME ?? 'local'}.zip` }],
+      ]
     : [['list'], ['html', { open: 'never' }]],
 
   use: {
