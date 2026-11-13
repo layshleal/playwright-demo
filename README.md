@@ -58,6 +58,12 @@ Debug a single test with the UI mode:
 npx playwright test --ui
 ```
 
+## Accessibility
+
+`tests/ui/accessibility.spec.ts` scans the key pages with [axe-core](https://github.com/dequelabs/axe-core) against WCAG 2.1 A/AA rules. Serious and critical violations fail the test; the full axe result is attached to the HTML report.
+
+Automated scanning only catches part of the accessibility issues. **Keyboard navigation** (focus order, visible focus, no keyboard traps) and **screen reader** experience (what is announced, and whether it makes sense) still need manual testing.
+
 ## Design decisions
 
 - **Why fixtures instead of `beforeEach` everywhere?** Fixtures make dependencies explicit and lazy: a test that asks for `loggedIn` gets a logged-in session, one that doesn't pays nothing.
