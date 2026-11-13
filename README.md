@@ -1,6 +1,8 @@
 # Playwright Demo – UI & API test automation
 
-[![Playwright tests](https://github.com/<your-user>/playwright-demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/<your-user>/playwright-demo/actions/workflows/playwright.yml)
+[![Playwright tests](https://github.com/layshleal/playwright-demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/layshleal/playwright-demo/actions/workflows/playwright.yml)
+
+**[View the latest test report](https://layshleal.github.io/playwright-demo/)** – all tests across Chromium, Firefox, mobile WebKit and the API, published from CI on every push to `main`.
 
 A small but production-style test automation project built with **Playwright + TypeScript**.
 It shows how I structure UI and API tests so they stay readable, stable, and fast in CI.
@@ -19,7 +21,7 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 - **Cross-browser & mobile** – Chromium, Firefox and WebKit (iPhone 15 Pro emulation).
 - **API tests in the same framework** – using Playwright's `request` fixture, no extra libraries.
 - **Tags** – `@smoke` subset for quick feedback.
-- **CI-ready** – GitHub Actions matrix per project, nightly schedule, retries + traces on failure, HTML and JUnit reports uploaded as artifacts.
+- **CI-ready** – GitHub Actions matrix per project, nightly schedule, retries + traces on failure, HTML and JUnit reports uploaded as artifacts, merged HTML report published to GitHub Pages.
 
 ## Project structure
 
@@ -33,7 +35,7 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 │   └── CheckoutPage.ts
 ├── test-data/users.ts                 # test users and customer data
 ├── tests/
-│   ├── ui/                            # login, inventory, checkout
+│   ├── ui/                            # login, inventory, checkout, accessibility
 │   └── api/                           # booking API
 └── playwright.config.ts               # projects: chromium, firefox, mobile, api
 ```
@@ -62,15 +64,15 @@ npx playwright test --ui
 
 `tests/ui/accessibility.spec.ts` scans the key pages with [axe-core](https://github.com/dequelabs/axe-core) against WCAG 2.1 A/AA rules. Serious and critical violations fail the test; the full axe result is attached to the HTML report.
 
-Automated scanning only catches part of the accessibility issues. **Keyboard navigation** (focus order, visible focus, no keyboard traps) and **screen reader** experience (what is announced, and whether it makes sense) still need manual testing.
+Automated scanning only catches part of the accessibility issues (roughly 30–40% of WCAG problems). **Keyboard navigation** (focus order, visible focus, no keyboard traps) and **screen reader** experience (what is announced, and whether it makes sense) still need manual testing.
 
 ## Design decisions
 
 - **Why fixtures instead of `beforeEach` everywhere?** Fixtures make dependencies explicit and lazy: a test that asks for `loggedIn` gets a logged-in session, one that doesn't pays nothing.
 - **Why test the price math?** Checking that `total = item total + tax` catches real business bugs, not just "the page loaded".
-- **Why retries only in CI?** Locally a failure should be visible immediately; in CI one retry with a trace helps separate flaky tests from real regressions.
+- **Why retries only in CI?** Locally a failure should be visible immediately; in CI retries with a trace help separate flaky tests from real regressions.
 
 ## Author
 
 **Helena Leal** – QA Engineer · Playwright, API testing, CI
-[LinkedIn](https://www.linkedin.com/in/<your-profile>)
+[LinkedIn](https://www.linkedin.com/in/lays-helena-leal/)
