@@ -166,6 +166,18 @@ expect(booking).toEqual(newBooking);
 - **One source of truth** – TypeScript types come from the schemas (`z.infer`), so test data and assertions cannot drift apart.
 - **The schema is tested too** – `tests/api/booking-schema.spec.ts` feeds it broken payloads (missing field, price as a string, negative price, non-ISO date, extra field) and checks that each one is rejected.
 
+### Negative cases and known API defects
+
+`tests/api/booking-negative.spec.ts` covers what happens when the client gets it wrong: unknown and non-numeric ids (404), malformed JSON (400), delete without a token (403). Probing the real API also exposed three defects, kept as **characterization tests** with a `known-api-defect` annotation in the report:
+
+| Request | A well-behaved API | Restful Booker today |
+|---|---|---|
+| Booking without required fields | 400 | **500** server error |
+| `totalprice: "cheap"` | 400 | **200**, price silently stored as `null` (the contract schema rejects the response) |
+| Wrong password | 401 | **200** with `{ "reason": "Bad credentials" }` |
+
+They assert today's behaviour, so if the API is fixed the test fails and says exactly what changed. `test.fail()` was avoided on purpose: it would also turn a timeout or a network error into a green "expected failure".
+
 ## Network mocking
 
 `tests/demo/network-mocking.spec.ts` drives the demo app's order history page (`demo-app/order-history.html`, which calls `GET api/orders.json`) through every state with `page.route()`, instead of hoping the backend happens to be slow, broken or empty during a run:
