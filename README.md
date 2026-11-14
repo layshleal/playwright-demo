@@ -1,6 +1,10 @@
 # Playwright Demo – a test automation case study
 
 [![Playwright tests](https://github.com/layshleal/playwright-demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/layshleal/playwright-demo/actions/workflows/playwright.yml)
+[![Test report](https://img.shields.io/badge/test%20report-GitHub%20Pages-2ea44f?logo=github)](https://layshleal.github.io/playwright-demo/)
+[![License: MIT](https://img.shields.io/github/license/layshleal/playwright-demo)](LICENSE)
+[![Playwright](https://img.shields.io/badge/Playwright-1.65-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](tsconfig.json)
 
 **[View the latest test report](https://layshleal.github.io/playwright-demo/)** – every test, every browser, published from CI on each push to `main`.
 
