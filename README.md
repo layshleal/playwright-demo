@@ -69,6 +69,8 @@ npx playwright test --ui
 
 `tests/ui/accessibility.spec.ts` scans the key pages with [axe-core](https://github.com/dequelabs/axe-core) against WCAG 2.1 A/AA rules. Serious and critical violations fail the test; the full axe result is attached to the HTML report.
 
+**The scan is tested too.** A green accessibility scan only means something if it can fail. `tests/demo/accessibility-control.spec.ts` runs axe on a demo page with three deliberate violations (image without `alt`, button without a name, low-contrast text) and asserts that exactly those three are reported, each on the right element. It also checks that the clean contact page reports none.
+
 Automated scanning only catches part of the accessibility issues (roughly 30–40% of WCAG problems). **Keyboard navigation** (focus order, visible focus, no keyboard traps) and **screen reader** experience (what is announced, and whether it makes sense) still need manual testing.
 
 ## Design decisions

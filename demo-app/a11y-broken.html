@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demo App – Accessibility control page</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; background: #fff; }
+      .low-contrast { color: #c4c4c4; }
+      button { padding: 0.5rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Accessibility control page</h1>
+      <p>This page contains three deliberate WCAG violations. The test suite must detect all of them.</p>
+
+      <!-- Violation 1 (image-alt): informative image without alternative text -->
+      <img
+        data-test="image-without-alt"
+        width="64"
+        height="64"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231d4ed8'/%3E%3C/svg%3E"
+      />
+
+      <!-- Violation 2 (button-name): icon-only button with no accessible name -->
+      <button type="button" data-test="button-without-name">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="2" /></svg>
+      </button>
+
+      <!-- Violation 3 (color-contrast): light grey text on white, ratio ~1.7:1 (AA needs 4.5:1) -->
+      <p class="low-contrast" data-test="low-contrast-text">This text is hard to read.</p>
+    </main>
+  </body>
+</html>
