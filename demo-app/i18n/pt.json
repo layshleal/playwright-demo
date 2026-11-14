@@ -1,0 +1,11 @@
+{
+  "title": "Demo App – Contato",
+  "languageNav": "Idioma",
+  "heading": "Fale conosco",
+  "nameLabel": "Nome",
+  "emailLabel": "E-mail",
+  "messageLabel": "Mensagem",
+  "submit": "Enviar",
+  "errorRequired": "Nome e e-mail são obrigatórios.",
+  "success": "Obrigado, {name}! Responderemos em breve."
+}

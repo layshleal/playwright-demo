@@ -10,7 +10,7 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 | Layer | Target | What is covered |
 |-------|--------|-----------------|
 | UI    | [saucedemo.com](https://www.saucedemo.com) | Login (happy path, locked user, validation), product sorting, cart, end-to-end checkout, price math |
-| UI    | Local demo app (`demo-app/`) | Contact form (submission, required-field validation) on pages we control |
+| UI    | Local demo app (`demo-app/`) | Contact form in English, Italian and Portuguese, accessibility control pages |
 | API   | [Restful Booker](https://restful-booker.herokuapp.com/apidoc/index.html) | Auth, full CRUD lifecycle, authorization errors, query filters |
 
 ## Highlights
@@ -72,6 +72,16 @@ npx playwright test --ui
 **The scan is tested too.** A green accessibility scan only means something if it can fail. `tests/demo/accessibility-control.spec.ts` runs axe on a demo page with three deliberate violations (image without `alt`, button without a name, low-contrast text) and asserts that exactly those three are reported, each on the right element. It also checks that the clean contact page reports none.
 
 Automated scanning only catches part of the accessibility issues (roughly 30–40% of WCAG problems). **Keyboard navigation** (focus order, visible focus, no keyboard traps) and **screen reader** experience (what is announced, and whether it makes sense) still need manual testing.
+
+## Multilingual testing (EN / IT / PT)
+
+The demo app loads its texts from `demo-app/i18n/<lang>.json`, and the tests import the same files. `tests/demo/i18n.spec.ts` runs the same contact flow in each language and checks:
+
+- **Translation files** – every locale has the same keys as English, no empty values, no text left in English (with a documented allowlist, e.g. Italian "Email"), and placeholders like `{name}` kept.
+- **Behaviour per language** – confirmation and validation messages, page title and `<html lang>` (used by screen readers).
+- **Layout** – no translated text cut off or overflowing its element, a common bug when Italian or Portuguese strings are longer than English.
+
+Because app and tests share the translation files, these tests catch missing, untranslated or broken texts, not a *wrong* translation. That still needs a native-speaker review.
 
 ## Design decisions
 

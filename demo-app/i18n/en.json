@@ -1,0 +1,11 @@
+{
+  "title": "Demo App – Contact",
+  "languageNav": "Language",
+  "heading": "Contact us",
+  "nameLabel": "Name",
+  "emailLabel": "Email",
+  "messageLabel": "Message",
+  "submit": "Send",
+  "errorRequired": "Name and email are required.",
+  "success": "Thanks, {name}! We will reply soon."
+}
