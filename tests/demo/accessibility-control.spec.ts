@@ -1,6 +1,6 @@
-import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '../../fixtures/test';
 import type { Page } from '@playwright/test';
+import { scanAccessibility } from '../../helpers/accessibility';
 
 /**
  * Control tests for the accessibility scan itself.
@@ -11,11 +11,8 @@ import type { Page } from '@playwright/test';
  * - Negative control: the clean contact page must report none, so the scan is not just noisy.
  */
 
-const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
-
 async function violations(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
-  return results.violations;
+  return (await scanAccessibility(page)).violations;
 }
 
 test.describe('Accessibility scan – control pages', () => {

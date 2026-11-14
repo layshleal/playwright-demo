@@ -79,6 +79,7 @@ Test suites usually fail teams in the same few ways:
 ├── .github/workflows/playwright.yml   # CI: matrix per browser + demo + API, nightly run
 ├── demo-app/                          # local static site + tiny Node server (webServer)
 ├── fixtures/test.ts                   # custom fixtures (page objects, logged-in state)
+├── helpers/accessibility.ts          # shared axe-core scan (WCAG 2.1 A/AA)
 ├── pages/                             # Page Object Model
 │   ├── LoginPage.ts
 │   ├── InventoryPage.ts

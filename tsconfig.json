@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    // type-check only: Playwright transforms the code itself, so resolve imports like a bundler
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "strict": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "baseUrl": ".",
     "types": ["node"]
   },
   "include": ["**/*.ts"],

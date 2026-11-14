@@ -1,6 +1,6 @@
-import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '../../fixtures/test';
 import type { Page, TestInfo } from '@playwright/test';
+import { scanAccessibility } from '../../helpers/accessibility';
 
 /**
  * Accessibility checks with axe-core against WCAG 2.1 A/AA rules.
@@ -11,14 +11,13 @@ import type { Page, TestInfo } from '@playwright/test';
  *   stays green while the problem is documented and tracked.
  */
 
-const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 const BLOCKING_IMPACTS = ['serious', 'critical'];
 
 // rule id -> why it is accepted for now (fill in after the first run)
 const KNOWN_ISSUES: Record<string, string> = {};
 
 async function scan(page: Page, testInfo: TestInfo, name: string) {
-  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  const results = await scanAccessibility(page);
 
   await testInfo.attach(`axe-${name}.json`, {
     body: JSON.stringify(results.violations, null, 2),
