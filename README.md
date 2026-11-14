@@ -1,11 +1,55 @@
-# Playwright Demo – UI & API test automation
+# Playwright Demo – a test automation case study
 
 [![Playwright tests](https://github.com/layshleal/playwright-demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/layshleal/playwright-demo/actions/workflows/playwright.yml)
 
-**[View the latest test report](https://layshleal.github.io/playwright-demo/)** – all tests across Chromium, Firefox, mobile WebKit and the API, published from CI on every push to `main`.
+**[View the latest test report](https://layshleal.github.io/playwright-demo/)** – every test, every browser, published from CI on each push to `main`.
 
-A small but production-style test automation project built with **Playwright + TypeScript**.
-It shows how I structure UI and API tests so they stay readable, stable, and fast in CI.
+A production-style test suite built with **Playwright + TypeScript**, written as the answer to one question: *how do you build UI and API tests a team can actually trust?*
+
+## The problem
+
+Test suites usually fail teams in the same few ways:
+
+- **Flaky tests** – red builds that turn green on re-run, until nobody reads red builds anymore.
+- **Gaps nobody checks** – a feature works in Chrome but not on an iPhone, the Italian translation is missing a string, a button has no accessible name.
+- **Silent contract changes** – an API starts returning a price as a string and the UI tests still pass.
+- **Green that proves nothing** – a scan or assertion that could never fail in the first place.
+
+## The approach
+
+| Problem | What this project does | Details |
+|---|---|---|
+| Flaky tests | Web-first assertions only, no fixed waits; CI retries surface flakes in the report, and a nightly run **fails** on any flaky test. A worked case with real numbers. | [Flaky case](docs/flaky-case.md) |
+| Cross-browser gaps | The same suite on Chromium, Firefox and mobile WebKit (iPhone 15 Pro), in parallel CI jobs. | [Structure](#project-structure) |
+| Multilingual products | One contact flow in English, Italian and Portuguese; translation files checked for missing, empty or untranslated text; layout checked for cut-off text. | [Multilingual](#multilingual-testing-en--it--pt) |
+| Accessibility | axe-core WCAG 2.1 AA scans, plus a control page with deliberate violations proving the scan catches them. | [Accessibility](#accessibility) |
+| Visual regressions | Screenshot comparison with baselines generated on the CI runner image, with a tolerance tight enough to catch a recoloured button. | [Visual](#visual-regression) |
+| API contract drift | Every API response validated against a strict zod schema before checking values. | [API contracts](#api-contract-testing) |
+| Green that proves nothing | New tests are broken on purpose and seen failing before they are trusted; control tests for the axe scan, the API schemas and the translation checks. | – |
+
+## The result
+
+| | |
+|---|---|
+| **Tests** | 87 across 5 projects (86 run in CI; 1 deliberately flaky example is opt-in) |
+| **Browsers** | 3 engines: Chromium, Firefox, WebKit (mobile) |
+| **Languages** | 3: English, Italian, Portuguese |
+| **CI time** | ~1 min 20 s per push: 5 test jobs in parallel, then the merged HTML report is published |
+| **Stability** | 12 consecutive green runs on `main`, including the nightly run that fails on flaky tests |
+| **Flaky case** | 5 failures in 50 runs → 0 in 50 after the fix |
+| **Accessibility** | 5 page states scanned against WCAG 2.1 AA; 3 of 3 deliberate violations detected on the control page |
+
+<p align="center">
+  <img src="docs/images/ci-run.png" alt="GitHub Actions run: chromium, firefox, mobile, demo and api jobs green, then the report is published, total 1 minute 17 seconds" width="860"><br>
+  <em>One push: five test jobs in parallel, then the merged report goes to GitHub Pages.</em>
+</p>
+
+<p align="center">
+  <img src="docs/images/report-demo.png" alt="Playwright HTML report filtered to the demo project: accessibility control, contact form, flaky case and translation tests, all passed" width="860"><br>
+  <em>The published report, filtered to the demo app project.</em>
+</p>
+
+## What is covered
 
 | Layer | Target | What is covered |
 |-------|--------|-----------------|
