@@ -1,25 +1,28 @@
 import { test, expect } from '../../fixtures/test';
+import { PRODUCTS, asPriceLabel } from '../../test-data/products';
+
+// Expected orders come from the known catalogue, not from the page itself:
+// web-first assertions then wait until the list is re-rendered in that order.
+const pricesAscending = PRODUCTS.map((p) => p.price).sort((a, b) => a - b).map(asPriceLabel);
+const namesZtoA = PRODUCTS.map((p) => p.name).sort().reverse();
 
 test.describe('Inventory', () => {
   test('sorts products by price, low to high', async ({ loggedIn }) => {
     await loggedIn.sortBy('lohi');
 
-    const prices = await loggedIn.prices();
-    expect(prices).toEqual([...prices].sort((a, b) => a - b));
+    await expect(loggedIn.itemPrices).toHaveText(pricesAscending);
   });
 
   test('sorts products by price, high to low', async ({ loggedIn }) => {
     await loggedIn.sortBy('hilo');
 
-    const prices = await loggedIn.prices();
-    expect(prices).toEqual([...prices].sort((a, b) => b - a));
+    await expect(loggedIn.itemPrices).toHaveText([...pricesAscending].reverse());
   });
 
   test('sorts products by name, Z to A', async ({ loggedIn }) => {
     await loggedIn.sortBy('za');
 
-    const names = await loggedIn.itemNames.allTextContents();
-    expect(names).toEqual([...names].sort().reverse());
+    await expect(loggedIn.itemNames).toHaveText(namesZtoA);
   });
 
   test('cart badge follows add and remove actions @smoke', async ({ loggedIn }) => {

@@ -25,6 +25,8 @@ test.describe('Flaky case – recent orders', () => {
 
     // BUG: count() is a one-off snapshot. If the API is slow, the list is still empty here.
     const count = await ordersPage.orders.count();
+    // The lint rule catches exactly this bug; it is disabled here only because the bug is the example.
+    // eslint-disable-next-line playwright/prefer-to-have-count -- deliberately flaky, see docs/flaky-case.md
     expect(count).toBe(EXPECTED_ORDERS);
   });
 

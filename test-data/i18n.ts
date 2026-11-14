@@ -18,3 +18,33 @@ export const SAME_AS_ENGLISH: Partial<Record<Locale, Record<string, string>>> = 
 export function messagesFor(locale: Locale): Messages {
   return locales[locale] as Messages;
 }
+
+/**
+ * Compares every locale with English and lists what is wrong: missing, empty, untranslated
+ * (unless allowed in SAME_AS_ENGLISH) or extra keys, and placeholders like {name} that were lost.
+ */
+export function translationProblems(): string[] {
+  const en = locales.en;
+  const problems: string[] = [];
+
+  for (const locale of localeCodes.filter((l) => l !== 'en')) {
+    const messages = locales[locale];
+    const allowed = SAME_AS_ENGLISH[locale] ?? {};
+
+    for (const key of Object.keys(en)) {
+      const value = messages[key];
+      if (value === undefined) problems.push(`${locale}.${key}: missing`);
+      else if (value.trim() === '') problems.push(`${locale}.${key}: empty`);
+      else if (value === en[key] && !(key in allowed)) problems.push(`${locale}.${key}: not translated ("${value}")`);
+
+      for (const placeholder of en[key].match(/\{\w+\}/g) ?? []) {
+        if (value && !value.includes(placeholder)) problems.push(`${locale}.${key}: lost ${placeholder}`);
+      }
+    }
+    for (const key of Object.keys(messages)) {
+      if (!(key in en)) problems.push(`${locale}.${key}: extra key not in English`);
+    }
+  }
+
+  return problems;
+}

@@ -1,33 +1,10 @@
 import { test, expect } from '../../fixtures/test';
 import { ContactPage } from '../../pages/ContactPage';
-import { SAME_AS_ENGLISH, localeCodes, locales } from '../../test-data/i18n';
+import { localeCodes, translationProblems } from '../../test-data/i18n';
 
 test.describe('Translation files', () => {
   test('every locale has the same keys as English, filled in and translated', () => {
-    const en = locales.en;
-    const problems: string[] = [];
-
-    for (const locale of localeCodes.filter((l) => l !== 'en')) {
-      const messages = locales[locale];
-      const allowed = SAME_AS_ENGLISH[locale] ?? {};
-
-      for (const key of Object.keys(en)) {
-        const value = messages[key];
-        if (value === undefined) problems.push(`${locale}.${key}: missing`);
-        else if (value.trim() === '') problems.push(`${locale}.${key}: empty`);
-        else if (value === en[key] && !(key in allowed)) problems.push(`${locale}.${key}: not translated ("${value}")`);
-
-        // placeholders like {name} must survive translation
-        for (const placeholder of en[key].match(/\{\w+\}/g) ?? []) {
-          if (value && !value.includes(placeholder)) problems.push(`${locale}.${key}: lost ${placeholder}`);
-        }
-      }
-      for (const key of Object.keys(messages)) {
-        if (!(key in en)) problems.push(`${locale}.${key}: extra key not in English`);
-      }
-    }
-
-    expect(problems).toEqual([]);
+    expect(translationProblems()).toEqual([]);
   });
 });
 

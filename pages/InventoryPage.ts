@@ -37,11 +37,6 @@ export class InventoryPage {
     await this.sortSelect.selectOption(option);
   }
 
-  async prices(): Promise<number[]> {
-    const texts = await this.itemPrices.allTextContents();
-    return texts.map((t) => Number(t.replace('$', '')));
-  }
-
   async openCart() {
     await this.cartLink.click();
   }
