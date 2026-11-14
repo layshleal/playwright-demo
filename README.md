@@ -11,7 +11,7 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 |-------|--------|-----------------|
 | UI    | [saucedemo.com](https://www.saucedemo.com) | Login (happy path, locked user, validation), product sorting, cart, end-to-end checkout, price math |
 | UI    | Local demo app (`demo-app/`) | Contact form in English, Italian and Portuguese, accessibility control pages |
-| API   | [Restful Booker](https://restful-booker.herokuapp.com/apidoc/index.html) | Auth, full CRUD lifecycle, authorization errors, query filters |
+| API   | [Restful Booker](https://restful-booker.herokuapp.com/apidoc/index.html) | Auth, full CRUD lifecycle, authorization errors, query filters, response contracts (schema validation) |
 
 ## Highlights
 
@@ -21,7 +21,7 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 - **Data-driven tests** – login validation runs from a table of cases.
 - **Cross-browser & mobile** – Chromium, Firefox and WebKit (iPhone 15 Pro emulation).
 - **Local demo app** – a static site started by Playwright's `webServer` (Node built-ins only, no extra dependencies), for scenarios a third-party site cannot provide.
-- **API tests in the same framework** – using Playwright's `request` fixture, no extra libraries.
+- **API tests in the same framework** – using Playwright's `request` fixture, with every response validated against a [zod](https://zod.dev) schema through a custom `toMatchSchema` matcher.
 - **Tags** – `@smoke` subset for quick feedback.
 - **CI-ready** – GitHub Actions matrix per project, nightly schedule, retries + traces on failure, HTML and JUnit reports uploaded as artifacts, merged HTML report published to GitHub Pages.
 
@@ -37,11 +37,12 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 │   ├── CartPage.ts
 │   ├── CheckoutPage.ts
 │   └── ContactPage.ts                 # demo app
-├── test-data/users.ts                 # test users and customer data
+├── schemas/booking.ts                 # API response contracts (zod)
+├── test-data/                         # test users, translations
 ├── tests/
 │   ├── ui/                            # login, inventory, checkout, accessibility
 │   ├── demo/                          # tests against the local demo app
-│   └── api/                           # booking API
+│   └── api/                           # booking API + schema control tests
 └── playwright.config.ts               # projects: chromium, firefox, mobile, demo, api
 ```
 
@@ -97,6 +98,20 @@ To refresh baselines after an intended UI change:
 gh workflow run update-snapshots.yml --ref <your-branch>
 gh run download <run-id> -n visual-baselines -D tests/
 ```
+
+## API contract testing
+
+Checking a few values (`toMatchObject`) misses a whole class of bugs: a price that becomes a string, a date in a new format, a field that disappears or appears. `schemas/booking.ts` describes each Restful Booker response with [zod](https://zod.dev), and every API test validates the body before checking values:
+
+```ts
+const { bookingid, booking } = await bodyOf(created, CreateBookingResponseSchema); // validated + typed
+expect(booking).toEqual(newBooking);
+```
+
+- **Strict objects** – an unexpected extra field fails the test, so contract changes are noticed, not silently accepted.
+- **Readable failures** – the custom `toMatchSchema` matcher prints the exact path, e.g. `expected number, received string → at booking.totalprice`.
+- **One source of truth** – TypeScript types come from the schemas (`z.infer`), so test data and assertions cannot drift apart.
+- **The schema is tested too** – `tests/api/booking-schema.spec.ts` feeds it broken payloads (missing field, price as a string, negative price, non-ISO date, extra field) and checks that each one is rejected.
 
 ## Flaky tests: a worked case
 

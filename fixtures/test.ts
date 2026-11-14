@@ -1,10 +1,26 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect as baseExpect } from '@playwright/test';
+import { z } from 'zod';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 import { ContactPage } from '../pages/ContactPage';
 import { PASSWORD, users } from '../test-data/users';
+
+export const expect = baseExpect.extend({
+  /** Validates a value (e.g. an API response body) against a zod schema, with a readable diff on failure. */
+  toMatchSchema(received: unknown, schema: z.ZodType) {
+    const result = schema.safeParse(received);
+    return {
+      name: 'toMatchSchema',
+      pass: result.success,
+      message: () =>
+        result.success
+          ? 'Expected value not to match the schema, but it did.'
+          : `Value does not match the schema:\n${z.prettifyError(result.error)}\n\nReceived:\n${JSON.stringify(received, null, 2)}`,
+    };
+  },
+});
 
 type Pages = {
   loginPage: LoginPage;
@@ -31,5 +47,3 @@ export const test = base.extend<Pages>({
     await use(inventoryPage);
   },
 });
-
-export { expect };
