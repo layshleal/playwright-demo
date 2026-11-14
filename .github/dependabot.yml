@@ -22,6 +22,10 @@ updates:
       # @types/node must follow the Node version used in CI (22), not the latest Node
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
+      # TypeScript 7: typescript-eslint 8 only supports TypeScript <6 (peer dependency), so npm ci
+      # fails (seen in PR #1). Remove this once typescript-eslint supports TypeScript 7.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /
