@@ -38,7 +38,9 @@ export default defineConfig({
   },
 
   use: {
-    trace: 'on-first-retry',
+    // trace of the FIRST failed attempt: with on-first-retry the trace shows the retry, which
+    // for a flaky test usually passes (see docs/flaky-case.md). Passing tests keep no trace.
+    trace: 'retain-on-first-failure',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
     testIdAttribute: 'data-test',

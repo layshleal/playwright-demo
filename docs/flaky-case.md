@@ -43,7 +43,7 @@ Tools used, in order:
 
 1. **The HTML report's "flaky" label.** CI runs with retries and the report marks tests that only passed on a retry. The nightly run in this repo sets `FAIL_ON_FLAKY=true` (`failOnFlakyTests` in `playwright.config.ts`), so a flaky test fails the nightly job instead of hiding.
 2. **The failure screenshot.** It shows the page still saying *"Loading orders…"* with an empty list. The test looked too early; the app was not broken.
-3. **The trace, of the failing attempt.** Watch out: this repo (like most) records traces with `trace: 'on-first-retry'`, which captures the *retry*. For a flaky test the retry usually passes, so that trace shows a green run and `count()` returning `3`, which is useless for the diagnosis. While reproducing, record the failure itself:
+3. **The trace, of the failing attempt.** Watch out: this repo used to record traces with `trace: 'on-first-retry'` (the most common setting), which captures the *retry*. For a flaky test the retry usually passes, so that trace shows a green run and `count()` returning `3`, which is useless for the diagnosis. While reproducing, record the failure itself:
 
    ```bash
    SHOW_FLAKY=1 npx playwright test flaky-case --project=demo --grep "reads the list once" --repeat-each=40 --trace=retain-on-failure
@@ -98,5 +98,6 @@ Before keeping it, this test was checked against the old pattern: with `count()`
 - Assert on **locators**, not on values pulled out of the page (`count()`, `textContent()`, `isVisible()`) followed by a plain `expect`.
 - Add a **deterministic test for the slow path** whenever the app has asynchronous data (here via `?delay=`; in real projects via `page.route()` to delay or mock the API).
 - When investigating, use **`--repeat-each` + `--trace=retain-on-failure`**: the trace you need is the one from the failed attempt, not from the retry.
+- **Applied to this repo:** the config now uses `trace: 'retain-on-first-failure'`. Every test records a trace on its first attempt, and it is kept only if that attempt fails, so CI keeps the evidence of the failure itself while retries still run. Checked with the flaky test, 40 repetitions and 2 retries: the 2 flaky runs each left one trace, from the first attempt, showing `count()` returning `0`.
 - Keep **`FAIL_ON_FLAKY` in a scheduled run**, so retries help day-to-day PRs without hiding new flaky tests.
 - Optional: the [`eslint-plugin-playwright`](https://github.com/playwright-community/eslint-plugin-playwright) rule `prefer-web-first-assertions` flags this pattern at review time.

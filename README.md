@@ -179,7 +179,7 @@ expect(booking).toEqual(newBooking);
 
 ## Flaky tests: a worked case
 
-[`docs/flaky-case.md`](docs/flaky-case.md) walks through a deliberately flaky test on the demo app, from symptom to fix, with real numbers. The flaky version failed **5 of 50** runs, retries hid 6 failures and still let 1 through, and the fixed version passed **50 of 50**. It covers measuring with `--repeat-each`, why the default `on-first-retry` trace shows the *passing* retry, the root cause (a one-off `count()` instead of a web-first assertion), and the "fixes" to avoid (`waitForTimeout`, more retries).
+[`docs/flaky-case.md`](docs/flaky-case.md) walks through a deliberately flaky test on the demo app, from symptom to fix, with real numbers. The flaky version failed **5 of 50** runs, retries hid 6 failures and still let 1 through, and the fixed version passed **50 of 50**. It covers measuring with `--repeat-each`, why the common `on-first-retry` trace shows the *passing* retry (this repo now keeps the trace of the first failed attempt instead), the root cause (a one-off `count()` instead of a web-first assertion), and the "fixes" to avoid (`waitForTimeout`, more retries).
 
 ## Design decisions
 
