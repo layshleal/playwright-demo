@@ -1,0 +1,35 @@
+# Weekly dependency updates as pull requests; CI (lint + all test projects) validates each one.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+    groups:
+      # Playwright test runner and its axe integration move together
+      playwright:
+        patterns: ['@playwright/*', '@axe-core/*']
+      lint:
+        patterns: ['eslint', '@eslint/*', 'typescript-eslint', 'eslint-plugin-playwright']
+      other-dev:
+        dependency-type: development
+        exclude-patterns: ['@playwright/*', '@axe-core/*', 'eslint', '@eslint/*', 'typescript-eslint', 'eslint-plugin-playwright']
+    ignore:
+      # @types/node must follow the Node version used in CI (22), not the latest Node
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ['*']
