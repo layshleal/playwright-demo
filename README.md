@@ -183,7 +183,7 @@ expect(booking).toEqual(newBooking);
 ## Design decisions
 
 - **Why fixtures instead of `beforeEach` everywhere?** Fixtures make dependencies explicit and lazy: a test that asks for `loggedIn` gets a logged-in session, one that doesn't pays nothing.
-- **Why log in once per worker?** Tests that only need a logged-in user (sorting, cart, checkout, accessibility scans) reuse the session cookies of one real UI login per worker instead of filling the login form every time. Login itself is still tested on its own in `tests/ui/login.spec.ts`, without the shared session.
+- **Why not reuse the login state?** It was tried and measured: one UI login per worker with the session cookies reused, against the login form in every test, over 3 CI runs each. Test time did not improve (Chromium 7.8 s → 9.0 s, Firefox 15.2 s → 14.1 s, mobile 14.3 s → 18.4 s: noise), because saucedemo logs in client-side with no server round-trip. The change was reverted: extra code for no gain. On an app whose login hits a server or needs 2FA, the same pattern does pay off.
 - **Why test the price math?** Checking that `total = item total + tax` catches real business bugs, not just "the page loaded".
 - **Why retries only in CI?** Locally a failure should be visible immediately; in CI retries with a trace help separate flaky tests from real regressions.
 

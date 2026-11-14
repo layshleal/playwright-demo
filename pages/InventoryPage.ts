@@ -21,10 +21,6 @@ export class InventoryPage {
     this.cartLink = page.getByTestId('shopping-cart-link');
   }
 
-  async goto() {
-    await this.page.goto('/inventory.html');
-  }
-
   item(name: string): Locator {
     return this.items.filter({ hasText: name });
   }
