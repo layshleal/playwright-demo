@@ -27,6 +27,24 @@ export class ContactPage {
     this.success = page.getByTestId('success');
   }
 
+  /** Language switcher link, e.g. languageLink('it') -> "IT" */
+  languageLink(locale: Locale): Locator {
+    return this.page.getByRole('link', { name: locale.toUpperCase(), exact: true });
+  }
+
+  /** Every element a keyboard user should reach with Tab, in visual order. */
+  tabStops(): Locator[] {
+    return [
+      this.languageLink('en'),
+      this.languageLink('it'),
+      this.languageLink('pt'),
+      this.name,
+      this.email,
+      this.message,
+      this.submitButton,
+    ];
+  }
+
   async goto() {
     await this.page.goto(`/?lang=${this.locale}`);
     // texts are loaded from a JSON file after the page opens: wait until they are in place
