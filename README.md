@@ -10,6 +10,8 @@
 
 A production-style test suite built with **Playwright + TypeScript**, written as the answer to one question: *how do you build UI and API tests a team can actually trust?*
 
+> **Auditing a test suite?** [docs/test-suite-audit.md](docs/test-suite-audit.md) is the checklist I use, with the evidence for each point in this repository.
+
 ## The problem
 
 Test suites usually fail teams in the same few ways:
@@ -36,7 +38,7 @@ Test suites usually fail teams in the same few ways:
 
 | | |
 |---|---|
-| **Tests** | 96 across 5 projects (95 run in CI; 1 deliberately flaky example is opt-in), plus lint and type checks |
+| **Tests** | 103 across 5 projects (102 run in CI; 1 deliberately flaky example is opt-in), plus lint and type checks |
 | **Browsers** | 3 engines: Chromium, Firefox, WebKit (mobile) |
 | **Languages** | 3: English, Italian, Portuguese |
 | **CI time** | ~1.5 min per push (77–106 s in recent runs): 5 test jobs in parallel, then the merged HTML report is published |
