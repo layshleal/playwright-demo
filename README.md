@@ -23,19 +23,20 @@ Test suites usually fail teams in the same few ways:
 
 | Problem | What this project does | Details |
 |---|---|---|
-| Flaky tests | Web-first assertions only, no fixed waits; CI retries surface flakes in the report, and a nightly run **fails** on any flaky test. A worked case with real numbers. | [Flaky case](docs/flaky-case.md) |
+| Flaky tests | Web-first assertions only, no fixed waits, enforced by ESLint with Playwright rules in CI; retries surface flakes in the report, and a nightly run **fails** on any flaky test. A worked case with real numbers. | [Flaky case](docs/flaky-case.md) |
 | Cross-browser gaps | The same suite on Chromium, Firefox and mobile WebKit (iPhone 15 Pro), in parallel CI jobs. | [Structure](#project-structure) |
 | Multilingual products | One contact flow in English, Italian and Portuguese; translation files checked for missing, empty or untranslated text; layout checked for cut-off text. | [Multilingual](#multilingual-testing-en--it--pt) |
-| Accessibility | axe-core WCAG 2.1 AA scans, plus a control page with deliberate violations proving the scan catches them. | [Accessibility](#accessibility) |
+| Accessibility | axe-core WCAG 2.1 AA scans, a control page with deliberate violations proving the scan catches them, and keyboard tests (Tab order, visible focus). | [Accessibility](#accessibility) |
 | Visual regressions | Screenshot comparison with baselines generated on the CI runner image, with a tolerance tight enough to catch a recoloured button. | [Visual](#visual-regression) |
 | API contract drift | Every API response validated against a strict zod schema before checking values. | [API contracts](#api-contract-testing) |
+| Unreliable backends | Slow, failing, offline and empty API responses forced with `page.route()`, deterministic and without timers. | [Network mocking](#network-mocking) |
 | Green that proves nothing | New tests are broken on purpose and seen failing before they are trusted; control tests for the axe scan, the API schemas and the translation checks. | – |
 
 ## The result
 
 | | |
 |---|---|
-| **Tests** | 87 across 5 projects (86 run in CI; 1 deliberately flaky example is opt-in) |
+| **Tests** | 96 across 5 projects (95 run in CI; 1 deliberately flaky example is opt-in), plus lint and type checks |
 | **Browsers** | 3 engines: Chromium, Firefox, WebKit (mobile) |
 | **Languages** | 3: English, Italian, Portuguese |
 | **CI time** | ~1.5 min per push (77–106 s in recent runs): 5 test jobs in parallel, then the merged HTML report is published |
