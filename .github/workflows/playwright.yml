@@ -16,7 +16,8 @@ concurrency:
 jobs:
   test:
     name: ${{ matrix.project }}
-    runs-on: ubuntu-latest
+    # pinned (not ubuntu-latest): visual baselines depend on the OS fonts of this exact image
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -76,7 +77,7 @@ jobs:
     needs: test
     # publish even when tests fail (a red report is still useful), but only from main
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       pages: write

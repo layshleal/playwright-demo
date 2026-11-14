@@ -88,7 +88,7 @@ Because app and tests share the translation files, these tests catch missing, un
 
 `tests/demo/visual.spec.ts` compares three screens of the demo app (English form, Italian validation error, Portuguese confirmation) against baseline images with `toHaveScreenshot`.
 
-- **Baselines are generated in CI, not on a laptop.** Fonts and anti-aliasing differ between Windows, macOS and Linux, so a baseline made locally would fail in CI on pixel noise. The manual workflow **Update visual baselines** (`.github/workflows/update-snapshots.yml`) renders them on the same Ubuntu runner the tests use and uploads them as an artifact. They are reviewed by eye, then committed.
+- **Baselines are generated in CI, not on a laptop.** Fonts and anti-aliasing differ between Windows, macOS and Linux, so a baseline made locally would fail in CI on pixel noise. The manual workflow **Update visual baselines** (`.github/workflows/update-snapshots.yml`) renders them on the same Ubuntu runner image the tests use (pinned to `ubuntu-26.04`, not `ubuntu-latest`, so a silent runner upgrade cannot invalidate the baselines) and uploads them as an artifact. They are reviewed by eye, then committed.
 - **On non-Linux machines the visual tests are skipped** with a clear reason, instead of producing false failures.
 - **Tolerance:** at most 100 pixels may differ (anti-aliasing), and animations are disabled. An absolute count on purpose: a 1% ratio was tried first and let a whole button change colour pass (the button is only ~0.5% of the page). A real change, like a different button colour, fails the test and the HTML report shows expected, actual and diff side by side.
 

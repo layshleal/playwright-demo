@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    # must match the image of the test job in playwright.yml
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
