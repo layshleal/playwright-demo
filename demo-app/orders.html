@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demo App – Recent orders</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+      ul { padding-left: 1.25rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Recent orders</h1>
+      <p data-test="loading" role="status">Loading orders…</p>
+      <ul data-test="orders" aria-label="Recent orders"></ul>
+    </main>
+
+    <script>
+      // Simulates an API that is usually fast but sometimes slow (used by docs/flaky-case.md).
+      // ?delay=<ms> forces a fixed response time, to reproduce a timing problem on demand.
+      const ORDERS = ['#1001 – Backpack', '#1002 – Bike light', '#1003 – Fleece jacket'];
+      const forced = new URLSearchParams(location.search).get('delay');
+      const delay = forced !== null ? Number(forced) : Math.random() < 0.8 ? 0 : 500;
+
+      function render() {
+        const list = document.querySelector('[data-test="orders"]');
+        for (const order of ORDERS) {
+          const item = document.createElement('li');
+          item.textContent = order;
+          list.append(item);
+        }
+        document.querySelector('[data-test="loading"]').hidden = true;
+      }
+
+      if (delay === 0) render();
+      else setTimeout(render, delay);
+    </script>
+  </body>
+</html>

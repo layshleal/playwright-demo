@@ -98,6 +98,10 @@ gh workflow run update-snapshots.yml --ref <your-branch>
 gh run download <run-id> -n visual-baselines -D tests/
 ```
 
+## Flaky tests: a worked case
+
+[`docs/flaky-case.md`](docs/flaky-case.md) walks through a deliberately flaky test on the demo app, from symptom to fix, with real numbers. The flaky version failed **5 of 50** runs, retries hid 6 failures and still let 1 through, and the fixed version passed **50 of 50**. It covers measuring with `--repeat-each`, why the default `on-first-retry` trace shows the *passing* retry, the root cause (a one-off `count()` instead of a web-first assertion), and the "fixes" to avoid (`waitForTimeout`, more retries).
+
 ## Design decisions
 
 - **Why fixtures instead of `beforeEach` everywhere?** Fixtures make dependencies explicit and lazy: a test that asks for `loggedIn` gets a logged-in session, one that doesn't pays nothing.
