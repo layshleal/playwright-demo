@@ -30,6 +30,11 @@ export default defineConfig({
     timeout: 15_000,
   },
 
+  expect: {
+    // visual regression: tolerate anti-aliasing noise (up to 1% of pixels), never animations
+    toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: 'disabled' },
+  },
+
   use: {
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
