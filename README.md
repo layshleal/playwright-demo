@@ -83,6 +83,21 @@ The demo app loads its texts from `demo-app/i18n/<lang>.json`, and the tests imp
 
 Because app and tests share the translation files, these tests catch missing, untranslated or broken texts, not a *wrong* translation. That still needs a native-speaker review.
 
+## Visual regression
+
+`tests/demo/visual.spec.ts` compares three screens of the demo app (English form, Italian validation error, Portuguese confirmation) against baseline images with `toHaveScreenshot`.
+
+- **Baselines are generated in CI, not on a laptop.** Fonts and anti-aliasing differ between Windows, macOS and Linux, so a baseline made locally would fail in CI on pixel noise. The manual workflow **Update visual baselines** (`.github/workflows/update-snapshots.yml`) renders them on the same Ubuntu runner the tests use and uploads them as an artifact. They are reviewed by eye, then committed.
+- **On non-Linux machines the visual tests are skipped** with a clear reason, instead of producing false failures.
+- **Tolerance:** at most 100 pixels may differ (anti-aliasing), and animations are disabled. An absolute count on purpose: a 1% ratio was tried first and let a whole button change colour pass (the button is only ~0.5% of the page). A real change, like a different button colour, fails the test and the HTML report shows expected, actual and diff side by side.
+
+To refresh baselines after an intended UI change:
+
+```bash
+gh workflow run update-snapshots.yml --ref <your-branch>
+gh run download <run-id> -n visual-baselines -D tests/
+```
+
 ## Design decisions
 
 - **Why fixtures instead of `beforeEach` everywhere?** Fixtures make dependencies explicit and lazy: a test that asks for `loggedIn` gets a logged-in session, one that doesn't pays nothing.

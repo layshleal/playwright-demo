@@ -31,8 +31,10 @@ export default defineConfig({
   },
 
   expect: {
-    // visual regression: tolerate anti-aliasing noise (up to 1% of pixels), never animations
-    toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: 'disabled' },
+    // visual regression: allow a few anti-aliased pixels, never animations.
+    // An absolute pixel count, not a ratio: 1% of a 1280x720 page (~9,200 px) would hide
+    // a whole button changing colour (~4,500 px).
+    toHaveScreenshot: { maxDiffPixels: 100, animations: 'disabled' },
   },
 
   use: {
