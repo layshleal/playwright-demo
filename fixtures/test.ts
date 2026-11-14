@@ -1,4 +1,4 @@
-import { test as base, expect as baseExpect } from '@playwright/test';
+import { test as base, expect as baseExpect, type BrowserContext } from '@playwright/test';
 import { z } from 'zod';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
@@ -33,17 +33,43 @@ type Pages = {
   loggedIn: InventoryPage;
 };
 
-export const test = base.extend<Pages>({
+type WorkerState = {
+  /** Session cookies of standard_user, from one real UI login per worker */
+  standardUserCookies: Cookie[];
+};
+
+type Cookie = Parameters<BrowserContext['addCookies']>[0][number];
+
+export const test = base.extend<Pages, WorkerState>({
+  // Log in through the UI once per worker (same browser as the project) and keep the cookies.
+  // Login itself is still covered by tests/ui/login.spec.ts, which never uses this state.
+  standardUserCookies: [
+    async ({ browser }, use, workerInfo) => {
+      const context = await browser.newContext({ baseURL: workerInfo.project.use.baseURL });
+      const page = await context.newPage();
+      const loginPage = new LoginPage(page);
+      await loginPage.goto();
+      await loginPage.login(users.standard, PASSWORD);
+      await expect(page).toHaveURL(/inventory\.html/);
+      const { cookies } = await context.storageState();
+      await context.close();
+      await use(cookies);
+    },
+    { scope: 'worker' },
+  ],
+
   loginPage: async ({ page }, use) => use(new LoginPage(page)),
   inventoryPage: async ({ page }, use) => use(new InventoryPage(page)),
   cartPage: async ({ page }, use) => use(new CartPage(page)),
   checkoutPage: async ({ page }, use) => use(new CheckoutPage(page)),
   contactPage: async ({ page }, use) => use(new ContactPage(page)),
 
-  loggedIn: async ({ page, loginPage, inventoryPage }, use) => {
-    await loginPage.goto();
-    await loginPage.login(users.standard, PASSWORD);
+  // Reuses the worker's session: no login form per test, just the cookies and a page load.
+  loggedIn: async ({ page, standardUserCookies, inventoryPage }, use) => {
+    await page.context().addCookies(standardUserCookies);
+    await inventoryPage.goto();
     await expect(page).toHaveURL(/inventory\.html/);
+    await expect(inventoryPage.title).toHaveText('Products');
     await use(inventoryPage);
   },
 });
