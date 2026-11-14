@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const isCI = !!process.env.CI;
+const DEMO_PORT = 4173;
 
 export default defineConfig({
   testDir: './tests',
@@ -19,6 +20,15 @@ export default defineConfig({
         ['blob', { fileName: `report-${process.env.BLOB_REPORT_NAME ?? 'local'}.zip` }],
       ]
     : [['list'], ['html', { open: 'never' }]],
+
+  // local demo app (demo-app/) for tests that need pages we control
+  webServer: {
+    command: 'node demo-app/server.mjs',
+    url: `http://localhost:${DEMO_PORT}`,
+    env: { DEMO_PORT: String(DEMO_PORT) },
+    reuseExistingServer: !isCI,
+    timeout: 15_000,
+  },
 
   use: {
     trace: 'on-first-retry',
@@ -42,6 +52,11 @@ export default defineConfig({
       name: 'mobile',
       testDir: './tests/ui',
       use: { ...devices['iPhone 15 Pro'], baseURL: 'https://www.saucedemo.com' },
+    },
+    {
+      name: 'demo',
+      testDir: './tests/demo',
+      use: { ...devices['Desktop Chrome'], baseURL: `http://localhost:${DEMO_PORT}` },
     },
     {
       name: 'api',

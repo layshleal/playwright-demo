@@ -10,6 +10,7 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 | Layer | Target | What is covered |
 |-------|--------|-----------------|
 | UI    | [saucedemo.com](https://www.saucedemo.com) | Login (happy path, locked user, validation), product sorting, cart, end-to-end checkout, price math |
+| UI    | Local demo app (`demo-app/`) | Contact form (submission, required-field validation) on pages we control |
 | API   | [Restful Booker](https://restful-booker.herokuapp.com/apidoc/index.html) | Auth, full CRUD lifecycle, authorization errors, query filters |
 
 ## Highlights
@@ -19,6 +20,7 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 - **Stable locators** – `getByTestId` / `getByRole` only, no CSS or XPath chains.
 - **Data-driven tests** – login validation runs from a table of cases.
 - **Cross-browser & mobile** – Chromium, Firefox and WebKit (iPhone 15 Pro emulation).
+- **Local demo app** – a static site started by Playwright's `webServer` (Node built-ins only, no extra dependencies), for scenarios a third-party site cannot provide.
 - **API tests in the same framework** – using Playwright's `request` fixture, no extra libraries.
 - **Tags** – `@smoke` subset for quick feedback.
 - **CI-ready** – GitHub Actions matrix per project, nightly schedule, retries + traces on failure, HTML and JUnit reports uploaded as artifacts, merged HTML report published to GitHub Pages.
@@ -26,18 +28,21 @@ It shows how I structure UI and API tests so they stay readable, stable, and fas
 ## Project structure
 
 ```
-├── .github/workflows/playwright.yml   # CI: matrix per browser + API, nightly run
+├── .github/workflows/playwright.yml   # CI: matrix per browser + demo + API, nightly run
+├── demo-app/                          # local static site + tiny Node server (webServer)
 ├── fixtures/test.ts                   # custom fixtures (page objects, logged-in state)
 ├── pages/                             # Page Object Model
 │   ├── LoginPage.ts
 │   ├── InventoryPage.ts
 │   ├── CartPage.ts
-│   └── CheckoutPage.ts
+│   ├── CheckoutPage.ts
+│   └── ContactPage.ts                 # demo app
 ├── test-data/users.ts                 # test users and customer data
 ├── tests/
 │   ├── ui/                            # login, inventory, checkout, accessibility
+│   ├── demo/                          # tests against the local demo app
 │   └── api/                           # booking API
-└── playwright.config.ts               # projects: chromium, firefox, mobile, api
+└── playwright.config.ts               # projects: chromium, firefox, mobile, demo, api
 ```
 
 ## Running locally

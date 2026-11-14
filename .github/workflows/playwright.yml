@@ -28,6 +28,8 @@ jobs:
             browser: firefox
           - project: mobile
             browser: webkit
+          - project: demo
+            browser: chromium
           - project: api
             browser: ''
 
