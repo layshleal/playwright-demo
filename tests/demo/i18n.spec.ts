@@ -29,6 +29,8 @@ for (const locale of localeCodes) {
     test('missing required fields shows the error in the right language', async () => {
       await contact.submit({ name: '', email: '' });
 
+      // translated texts are filled in even while hidden: check visibility, not only text
+      await expect(contact.error).toBeVisible();
       await expect(contact.error).toHaveText(contact.t.errorRequired);
       await expect(contact.success).toBeHidden();
     });

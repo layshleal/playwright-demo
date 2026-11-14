@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demo App – Order history</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+      .error { color: #b91c1c; }
+      button { padding: 0.4rem 0.8rem; font: inherit; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Order history</h1>
+      <p data-test="loading" role="status" hidden>Loading orders…</p>
+      <div data-test="error" role="alert" hidden>
+        <p class="error">Could not load your orders.</p>
+        <button type="button" data-test="retry">Try again</button>
+      </div>
+      <p data-test="empty" hidden>You have no orders yet.</p>
+      <ul data-test="orders" aria-label="Orders"></ul>
+    </main>
+
+    <script>
+      // Loads orders from a real HTTP endpoint (api/orders.json), so tests can
+      // intercept the request with page.route() and force slow, failing or empty responses.
+      const loading = document.querySelector('[data-test="loading"]');
+      const error = document.querySelector('[data-test="error"]');
+      const empty = document.querySelector('[data-test="empty"]');
+      const list = document.querySelector('[data-test="orders"]');
+
+      async function loadOrders() {
+        loading.hidden = false;
+        error.hidden = true;
+        empty.hidden = true;
+        list.replaceChildren();
+
+        try {
+          const response = await fetch('api/orders.json');
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const orders = await response.json();
+
+          if (orders.length === 0) empty.hidden = false;
+          for (const order of orders) {
+            const item = document.createElement('li');
+            item.textContent = `#${order.id} – ${order.item} (${order.status})`;
+            list.append(item);
+          }
+        } catch {
+          error.hidden = false;
+        } finally {
+          loading.hidden = true;
+        }
+      }
+
+      document.querySelector('[data-test="retry"]').addEventListener('click', loadOrders);
+      loadOrders();
+    </script>
+  </body>
+</html>

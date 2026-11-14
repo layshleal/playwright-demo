@@ -85,7 +85,8 @@ Test suites usually fail teams in the same few ways:
 │   ├── InventoryPage.ts
 │   ├── CartPage.ts
 │   ├── CheckoutPage.ts
-│   └── ContactPage.ts                 # demo app
+│   ├── ContactPage.ts                 # demo app
+│   ├── OrdersPage.ts / OrderHistoryPage.ts  # demo app (flaky case, network mocking)
 ├── schemas/booking.ts                 # API response contracts (zod)
 ├── test-data/                         # test users, translations
 ├── tests/
@@ -161,6 +162,17 @@ expect(booking).toEqual(newBooking);
 - **Readable failures** – the custom `toMatchSchema` matcher prints the exact path, e.g. `expected number, received string → at booking.totalprice`.
 - **One source of truth** – TypeScript types come from the schemas (`z.infer`), so test data and assertions cannot drift apart.
 - **The schema is tested too** – `tests/api/booking-schema.spec.ts` feeds it broken payloads (missing field, price as a string, negative price, non-ISO date, extra field) and checks that each one is rejected.
+
+## Network mocking
+
+`tests/demo/network-mocking.spec.ts` drives the demo app's order history page (`demo-app/order-history.html`, which calls `GET api/orders.json`) through every state with `page.route()`, instead of hoping the backend happens to be slow, broken or empty during a run:
+
+- **Slow API** – the mocked response is *held* until the test has checked the loading state, then released. Deterministic, with no timers.
+- **Server error (500) and retry** – the first call fails, "Try again" succeeds, and the test checks exactly two requests were made.
+- **Network failure** – the request is aborted as if the connection dropped.
+- **Empty list** – the empty-state message is shown.
+
+**A lesson found while writing them:** status messages that are always in the HTML (just `hidden`) pass `toHaveText` even when the user never sees them. Breaking the demo app on purpose so the contact-form error never appeared left four existing tests green. Every message check now asserts `toBeVisible()` first, and the same break turns them red.
 
 ## Flaky tests: a worked case
 
