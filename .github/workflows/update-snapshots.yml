@@ -1,0 +1,37 @@
+name: Update visual baselines
+
+# Run manually (Actions tab or `gh workflow run update-snapshots.yml --ref <branch>`).
+# Generates the screenshot baselines on the same Linux runner the tests use,
+# and uploads them as an artifact to be reviewed and committed.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Generate baselines
+        run: npx playwright test --project=demo --grep @visual --update-snapshots=all
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: visual-baselines
+          path: tests/**/*-snapshots/
+          if-no-files-found: error
+          retention-days: 7
