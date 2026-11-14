@@ -38,7 +38,7 @@ Test suites usually fail teams in the same few ways:
 | **Tests** | 87 across 5 projects (86 run in CI; 1 deliberately flaky example is opt-in) |
 | **Browsers** | 3 engines: Chromium, Firefox, WebKit (mobile) |
 | **Languages** | 3: English, Italian, Portuguese |
-| **CI time** | ~1 min 20 s per push: 5 test jobs in parallel, then the merged HTML report is published |
+| **CI time** | ~1.5 min per push (77–106 s in recent runs): 5 test jobs in parallel, then the merged HTML report is published |
 | **Stability** | 12 consecutive green runs on `main`, including the nightly run that fails on flaky tests |
 | **Flaky case** | 5 failures in 50 runs → 0 in 50 after the fix |
 | **Accessibility** | 5 page states scanned against WCAG 2.1 AA; 3 of 3 deliberate violations detected on the control page |
