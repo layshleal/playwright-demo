@@ -63,7 +63,16 @@ jobs:
 
       - name: Install browsers
         if: matrix.browser != ''
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+        # A slow Ubuntu mirror once hung this step until the 20-minute job limit.
+        # Cap each attempt at 4 minutes (a normal install takes about 1) and retry.
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: |
+          for attempt in 1 2 3; do
+            timeout --kill-after=30s 4m npx playwright install --with-deps "$BROWSER" && exit 0
+            echo "::warning::Browser install attempt $attempt failed or timed out, retrying"
+          done
+          exit 1
 
       - name: Run tests
         run: npx playwright test --project=${{ matrix.project }}
